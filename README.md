@@ -42,7 +42,8 @@
 ## How to use
 
 1. Install [python](https://www.python.org/downloads/)
-2. Get code [here](https://github.com/iYasha/clickup-worked-time-overview/releases/tag/v1.0.0) or
+2. Get [personal ClickUp API key](https://docs.clickup.com/en/articles/1367130-getting-started-with-the-clickup-api)
+3. Get code [here](https://github.com/iYasha/clickup-worked-time-overview/releases/tag/v1.0.0) or
 ```sh
 git clone https://github.com/iYasha/clickup-worked-time-overview.git
 ```
