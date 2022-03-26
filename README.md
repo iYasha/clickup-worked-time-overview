@@ -42,9 +42,26 @@
 ## How to use
 
 1. Install [python](https://www.python.org/downloads/)
-2. Get code
+2. Get code [here](https://github.com/iYasha/clickup-worked-time-overview/releases/tag/v1.0.0) or
 ```sh
 git clone https://github.com/iYasha/clickup-worked-time-overview.git
+```
+3. Go to the directory
+```sh
+cd clickup-worked-time-overview
+```
+4. Run script
+```sh
+python main.py CLICKUP_TOKEN day/month
+```
+
+Example:
+```sh
+python main.py pk_12412342_CYASDASDASDASDASDASDASD day
+```
+or
+```sh
+python main.py pk_12412342_CYASDASDASDASDASDASDASD month
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
