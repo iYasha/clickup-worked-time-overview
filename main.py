@@ -51,7 +51,7 @@ def get_tracked_time(headers, team_id, assignee, start_at, end_at):
     return milliseconds_to_string(milliseconds)
 
 
-def main(token, period_type):
+def main(token):
     headers = {
         'Authorization': token
     }
@@ -60,24 +60,23 @@ def main(token, period_type):
         raise ValueError('You don\'t have any team')
     me = get_me(headers)
     for team in teams:
-        start_at, end_at = get_period(period_type)
-        time = get_tracked_time(headers, team['id'], me['id'], start_at, end_at)
+        start_at_day, end_at_day = get_period('day')
+        start_at_month, end_at_month = get_period('month')
+        
+        time_day = get_tracked_time(headers, team['id'], me['id'], start_at_day, end_at_day)
+        time_month = get_tracked_time(headers, team['id'], me['id'], start_at_month, end_at_month)
         print(team['name'])
-        print('\tTracked: ' + time)
+        print('\tDay: ' + time_day)
+        print('\tMonth: ' + time_month)
 
 
 if __name__ == '__main__':
-    available_period = ['day', 'month']
-    period = 'month'
 
-    if len(sys.argv) == 0:
-        print('ClickUp token is empty.')
-        exit(1)
-    if len(sys.argv) == 3:
-        if sys.argv[2] in available_period:
-            period = sys.argv[2]
+    with open('TOKEN.txt', 'r') as file:
+        token = file.read().rstrip()
+        file.close()
+        if len(token) > 0:
+            main(token)
         else:
-            print('Period %s incorrect' % sys.argv[2])
-            exit(1)
-    main(sys.argv[1], period)
+            print('Error: Paste token into TOKEN.txt at script root folder.')
 
