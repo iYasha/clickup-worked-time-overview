@@ -1,7 +1,10 @@
 import sys
+from typing import Optional
+
 import requests
 import datetime
 import calendar
+import argparse
 
 
 BASE_URL = 'https://api.clickup.com/api/v2/'
@@ -45,13 +48,15 @@ def get_period(period_type):
 
 
 def get_tracked_time(headers, team_id, assignee, start_at, end_at):
-    url = BASE_URL + 'team/%s/time_entries?start_date=%s&end_date=%s&assignee=%s' % (team_id, start_at, end_at, assignee)
+    url = f'{BASE_URL}team/{team_id}/time_entries?assignee={assignee}'
+    if start_at is not None or end_at is not None:
+        url = f'{url}&start_date={start_at}&end_date={end_at}'
     resp = get_success_response(url, headers)
     milliseconds = sum([int(x['duration']) for x in resp['data']])
     return milliseconds_to_string(milliseconds)
 
 
-def main(token, period_type):
+def main(token: str, period_type: str, workspace: Optional[str] = None):
     headers = {
         'Authorization': token
     }
@@ -59,25 +64,33 @@ def main(token, period_type):
     if teams is None:
         raise ValueError('You don\'t have any team')
     me = get_me(headers)
-    for team in teams:
+    start_at = end_at = None
+    if period_type != 'all':
         start_at, end_at = get_period(period_type)
+    for team in teams:
+        if workspace is not None and team['name'].lower() != workspace.lower():
+            continue
         time = get_tracked_time(headers, team['id'], me['id'], start_at, end_at)
         print(team['name'])
         print('\tTracked: ' + time)
 
 
 if __name__ == '__main__':
-    available_period = ['day', 'month']
-    period = 'month'
+    arguments = argparse.ArgumentParser()
+    arguments.add_argument('-t', '--token', type=str, help='ClickUp token')
+    arguments.add_argument('-p', '--period', type=str, default='all', help='Period type (day, month, all). Default: all')
+    arguments.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
+    arguments.add_argument('-w', '--workspace', type=str, help='Workspace name')
 
-    if len(sys.argv) == 0:
+    args = arguments.parse_args()
+
+    if args.token is None:
         print('ClickUp token is empty.')
         exit(1)
-    if len(sys.argv) == 3:
-        if sys.argv[2] in available_period:
-            period = sys.argv[2]
-        else:
-            print('Period %s incorrect' % sys.argv[2])
-            exit(1)
-    main(sys.argv[1], period)
+
+    if args.period not in ['day', 'month', 'all']:
+        print('Period %s incorrect' % args.period)
+        exit(1)
+
+    main(args.token, args.period, args.workspace)
 
